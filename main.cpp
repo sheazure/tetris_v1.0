@@ -3,6 +3,7 @@ Notes: координатой блока является левый верхн�
 
 разобраться почему застревает квадрат после T ----- выполнено!
 
+чтобы перевести координаты x и y в порядковый номер светодиода нужно  --->>>> 32 * y + x
 
 План для добавления новой фигуры:
 1 - Отрисовка и очистка
@@ -61,8 +62,11 @@ int main() {
     // объявление нужных переменных
     int last_block_position_x = 10;
     int last_block_position_y = 1;
-    int current_block = rand() % 3 + 1; // менять по мере добавления блоков
+    int current_block = rand() % 5 + 1; // менять по мере добавления блоков
     int rotate_pos_block = 1;
+
+    int copy_current_block = 5; // рабочая переменная для проверки того как ведут себя блоки(удалить в завершении работы)
+
     while (1) {
         // сделать выход из прогрммы
         // сделать проверку какой сейчас блок и исходя из этого выдать ему соответствующие координаты
@@ -71,18 +75,20 @@ int main() {
         if (_kbhit()) {
             switch (_getch()) {
             case 72: // up (поворот блока)
-                cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
+                cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
                 if (rotate_pos_block == 4) rotate_pos_block = 1;
                 else rotate_pos_block++;
+                
+                
                 break;
 
             case 80: // down
-                switch (current_block) {
+                switch (copy_current_block) {
                 case 1: // cube
                     if (matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#' || matrix[block_position_y + 3][block_position_x + 1] == '1') {
                     }
                     else {
-                        block_position_y += 1;
+                        block_position_y++;
                     }
                     break;
                 case 2: // T
@@ -91,28 +97,28 @@ int main() {
                         if (matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
                         }
                         else {
-                            block_position_y += 1;
+                            block_position_y++;
                         }
                         break;
                     case 2: // |-
                         if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x] == '#') {
                         }
                         else {
-                            block_position_y += 1;
+                            block_position_y++;
                         }
                         break;
                     case 3: // T
                         if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
                         }
                         else {
-                            block_position_y += 1;
+                            block_position_y++;
                         }
                         break;
                     case 4:
                         if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x - 1] == '1') {
                         }
                         else {
-                            block_position_y += 1;
+                            block_position_y++;
                         }
                         break;
 
@@ -124,19 +130,59 @@ int main() {
                         if (matrix[block_position_y + 4][block_position_x] == '1' || matrix[block_position_y + 4][block_position_x] == '#') {
                         }
                         else {
-                            block_position_y += 1;
+                            block_position_y++;
                         }
                         break;
                     case 0: // --
                         if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 2] == '#' || matrix[block_position_y + 1][block_position_x + 2] == '1') {
                         }
                         else {
-                            block_position_y += 1;
+                            block_position_y++;
                         }
                         break;
 
                     }
+                    break;
+                case 4:
+                    switch (rotate_pos_block % 2) {
+                    case 1: // S глав. точка уже смещена на один вниз
+                        if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1') {
 
+                        }
+                        else {
+                            block_position_y++;
+                        }
+                        break;
+                    case 0: // повернутая S 
+                        if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#') {
+
+                        }
+                        else {
+                            block_position_y++;
+                        }
+                        break;
+                    }
+                    break;
+                case 5:
+                    switch (rotate_pos_block % 2) {
+                    case 1: // Z
+                        if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1') {
+
+                        }
+                        else {
+                            block_position_y++;
+                        }
+                        break;
+                    case 0:
+                        if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x - 1] == '1' || matrix[block_position_y + 3][block_position_x - 1] == '#') {
+
+                        }
+                        else {
+                            block_position_y++;
+                        }
+                        break;
+                    }
+                    break;
                 }
 
             }
@@ -148,14 +194,14 @@ int main() {
 
 
         // проверка упал ли блок
-        switch (current_block) {
+        switch (copy_current_block) {
         case 1: // cube
             if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#') {
                 block_position_x = 10;
                 block_position_y = 1;
                 last_block_position_x = 10;
                 last_block_position_y = 1;
-                current_block = rand() % 2 + 1;
+                current_block = rand() % 5 + 1;
                 rotate_pos_block = 1;
             }
             break;
@@ -170,7 +216,7 @@ int main() {
                     block_position_y = 1;
                     last_block_position_x = 10;
                     last_block_position_y = 1;
-                    current_block = rand() % 2 + 1;
+                    current_block = rand() % 5 + 1;
                     rotate_pos_block = 1;
 
                 }
@@ -183,7 +229,7 @@ int main() {
                     block_position_y = 1;
                     last_block_position_x = 10;
                     last_block_position_y = 1;
-                    current_block = rand() % 2 + 1;
+                    current_block = rand() % 5 + 1;
                     rotate_pos_block = 1;
 
                 }
@@ -195,7 +241,7 @@ int main() {
                     block_position_y = 1;
                     last_block_position_x = 10;
                     last_block_position_y = 1;
-                    current_block = rand() % 2 + 1;
+                    current_block = rand() % 5 + 1;
                     rotate_pos_block = 1;
                 }
                 break;
@@ -206,7 +252,7 @@ int main() {
                     block_position_y = 1;
                     last_block_position_x = 10;
                     last_block_position_y = 1;
-                    current_block = rand() % 2 + 1;
+                    current_block = rand() % 5 + 1;
                     rotate_pos_block = 1;
 
                 }
@@ -222,7 +268,7 @@ int main() {
                     block_position_y = 1;
                     last_block_position_x = 10;
                     last_block_position_y = 1;
-                    current_block = rand() % 2 + 1;
+                    current_block = rand() % 5 + 1;
                     rotate_pos_block = 1;
                 }
                 break;
@@ -232,18 +278,68 @@ int main() {
                     block_position_y = 1;
                     last_block_position_x = 10;
                     last_block_position_y = 1;
-                    current_block = rand() % 2 + 1;
+                    current_block = rand() % 5 + 1;
                     rotate_pos_block = 1;
                 }
                 break;
             }
             break;
+        case 4: // S
+            switch (rotate_pos_block % 2) {
+            case 1: // S
+                if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x + 1] == '1' || matrix[block_position_y][block_position_x + 1] == '#') {
+                    block_position_x = 10;
+                    block_position_y = 1;
+                    last_block_position_x = 10;
+                    last_block_position_y = 1;
+                    current_block = rand() % 5 + 1;
+                    rotate_pos_block = 1;
+                   }
+                break;
+            case 0:
+                if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
+                    block_position_x = 10;
+                    block_position_y = 1;
+                    last_block_position_x = 10;
+                    last_block_position_y = 1;
+                    current_block = rand() % 5 + 1;
+                    rotate_pos_block = 1;
+                }
+                break;
+            
+            }
+            break;
+        case 5:
+            switch (rotate_pos_block % 2) {
+            case 1: // Z
+                if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
+                    block_position_x = 10;
+                    block_position_y = 1;
+                    last_block_position_x = 10;
+                    last_block_position_y = 1;
+                    current_block = rand() % 5 + 1;
+                    rotate_pos_block = 1;
+                }
+                break;
+            case 0:
+                if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#') {
+                    block_position_x = 10;
+                    block_position_y = 1;
+                    last_block_position_x = 10;
+                    last_block_position_y = 1;
+                    current_block = rand() % 5 + 1;
+                    rotate_pos_block = 1;
+                }
+                break;
+            }
+            break;
+
         }
 
-        // отрисовка блока
+        // отрисовка блока на матрице
 
-        cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
-        writing_field_figure(matrix, current_block, rotate_pos_block);
+        cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
+        writing_field_figure(matrix, copy_current_block, rotate_pos_block);
 
 
 
@@ -319,6 +415,40 @@ void cleaning_field_figure(char(&ptr_matrix)[32][32], int last_pos_x, int last_p
             ptr_matrix[last_pos_y][last_pos_x + 2] = ' ';
             break;
         }
+        break;
+    case 4: // S
+        switch (rotate % 2) { // потому что поворотов фигуры всего 2
+        case 1: // S
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x + 1] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x - 1] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x] = ' ';
+            break;
+        case 0:
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x + 1] = ' ';
+            ptr_matrix[last_pos_y + 2][last_pos_x + 1] = ' ';
+            break;
+        }
+        break;
+
+    case 5: // Z
+        switch (rotate % 2) {
+        case 1: // Z главная точка центр верх
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x - 1] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x + 1] = ' ';
+            break;
+        case 0: // главная точка верх
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x - 1] = ' ';
+            ptr_matrix[last_pos_y + 2][last_pos_x - 1] = ' ';
+            break;
+        }
+        break;
 
     }
 }
@@ -378,6 +508,38 @@ void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotat
             break;
             
 
+        }
+        break;
+    case 4: // S
+        switch (rotate % 2) { // потому что поворотов фигуры всего 2
+        case 1: // S главная точка центр верх
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x] = '1';
+            break;
+        case 0: // главная точка верхняя
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y + 2][block_position_x + 1] = '1';
+            break;
+        }
+        break;
+    case 5: // Z
+        switch (rotate % 2) {
+        case 1: // Z главная точка центр верх
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+            break;
+        case 0: // главная точка верх
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y + 2][block_position_x - 1] = '1';
+            break;
         }
         break;
     }
