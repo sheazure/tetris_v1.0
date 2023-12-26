@@ -29,11 +29,19 @@ const int HEIGHT = 32;
 char matrix[32][32];
 int block_position_y = 1;
 int block_position_x = 10;
+int last_block_position_x = 10;
+int last_block_position_y = 1;
+int current_block = rand() % 5 + 1; // менять по мере добавления блоков
+int rotate_pos_block = 1;
+
+int copy_current_block = 6;
 
 
 // прототипы функций
 void cleaning_field_figure(char(&ptr_matrix)[32][32], int last_pos_x, int last_pos_y, int currentBlock, int rotate);
 void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotate);
+void check_block_fallen();
+void check_click();
 
 
 int main() {
@@ -59,289 +67,25 @@ int main() {
         matrix[i][31] = '#';
     }
 
-    // объявление нужных переменных
-    int last_block_position_x = 10;
-    int last_block_position_y = 1;
-    int current_block = rand() % 5 + 1; // менять по мере добавления блоков
-    int rotate_pos_block = 1;
-
-    int copy_current_block = 5; // рабочая переменная для проверки того как ведут себя блоки(удалить в завершении работы)
+ 
 
     while (1) {
+        system("cls");
         // сделать выход из прогрммы
         // сделать проверку какой сейчас блок и исходя из этого выдать ему соответствующие координаты
 
         // считывание нажатий клавиш для движения/поворота фигуры
-        if (_kbhit()) {
-            switch (_getch()) {
-            case 72: // up (поворот блока)
-                cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
-                if (rotate_pos_block == 4) rotate_pos_block = 1;
-                else rotate_pos_block++;
-                
-                
-                break;
-
-            case 80: // down
-                switch (copy_current_block) {
-                case 1: // cube
-                    if (matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#' || matrix[block_position_y + 3][block_position_x + 1] == '1') {
-                    }
-                    else {
-                        block_position_y++;
-                    }
-                    break;
-                case 2: // T
-                    switch (rotate_pos_block) {
-                    case 1: // inverted T
-                        if (matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    case 2: // |-
-                        if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x] == '#') {
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    case 3: // T
-                        if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    case 4:
-                        if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x - 1] == '1') {
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-
-                    }
-                    break;
-                case 3: // I
-                    switch (rotate_pos_block % 2) {
-                    case 1: // I
-                        if (matrix[block_position_y + 4][block_position_x] == '1' || matrix[block_position_y + 4][block_position_x] == '#') {
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    case 0: // --
-                        if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 2] == '#' || matrix[block_position_y + 1][block_position_x + 2] == '1') {
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-
-                    }
-                    break;
-                case 4:
-                    switch (rotate_pos_block % 2) {
-                    case 1: // S глав. точка уже смещена на один вниз
-                        if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1') {
-
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    case 0: // повернутая S 
-                        if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#') {
-
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    }
-                    break;
-                case 5:
-                    switch (rotate_pos_block % 2) {
-                    case 1: // Z
-                        if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1') {
-
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    case 0:
-                        if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x - 1] == '1' || matrix[block_position_y + 3][block_position_x - 1] == '#') {
-
-                        }
-                        else {
-                            block_position_y++;
-                        }
-                        break;
-                    }
-                    break;
-                }
-
-            }
-        }
+        check_click();
 
 
-
-        system("cls");
 
 
         // проверка упал ли блок
-        switch (copy_current_block) {
-        case 1: // cube
-            if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#') {
-                block_position_x = 10;
-                block_position_y = 1;
-                last_block_position_x = 10;
-                last_block_position_y = 1;
-                current_block = rand() % 5 + 1;
-                rotate_pos_block = 1;
-            }
-            break;
-
-
-        case 2: // T
-            switch (rotate_pos_block) {
-            case 1: // inverted T
-                if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#') {
-
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-
-                }
-                break;
-
-            case 2: // |-
-                if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x] == '#') {
-
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-
-                }
-                break;
-
-            case 3: // T
-                if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y][block_position_x + 1] == '1') {
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                }
-                break;
-            case 4: // -|
-                if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x - 1] == '1') {
-
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-
-                }
-                break;
-            }
-            break;
-        case 3:
-            switch (rotate_pos_block % 2) {
-            case 1: // I
-                if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x] == '#') {
-                    
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                }
-                break;
-            case 0: // -
-                if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x] == '#' || matrix[block_position_y][block_position_x] == '1' || matrix[block_position_y][block_position_x + 1] == '#' || matrix[block_position_y][block_position_x + 1] == '1' || matrix[block_position_y][block_position_x + 2] == '#' || matrix[block_position_y][block_position_x + 2] == '1') {
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                }
-                break;
-            }
-            break;
-        case 4: // S
-            switch (rotate_pos_block % 2) {
-            case 1: // S
-                if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x + 1] == '1' || matrix[block_position_y][block_position_x + 1] == '#') {
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                   }
-                break;
-            case 0:
-                if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                }
-                break;
-            
-            }
-            break;
-        case 5:
-            switch (rotate_pos_block % 2) {
-            case 1: // Z
-                if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                }
-                break;
-            case 0:
-                if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#') {
-                    block_position_x = 10;
-                    block_position_y = 1;
-                    last_block_position_x = 10;
-                    last_block_position_y = 1;
-                    current_block = rand() % 5 + 1;
-                    rotate_pos_block = 1;
-                }
-                break;
-            }
-            break;
-
-        }
-
+        check_block_fallen();
+        
         // отрисовка блока на матрице
-
         cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
         writing_field_figure(matrix, copy_current_block, rotate_pos_block);
-
-
 
         // вывод матрицы
         for (int i = 0; i < HEIGHT; i++) {
@@ -351,13 +95,357 @@ int main() {
             std::cout << '\n';
         }
 
-        
-
         last_block_position_x = block_position_x;
         last_block_position_y = block_position_y;
         // спуск вниз на 1, блок падает вниз
         block_position_y += 1;
 
+
+    }
+}
+void check_click() {
+    if (_kbhit()) {
+        switch (_getch()) {
+        case 72: // up (поворот блока)
+            cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
+            if (rotate_pos_block == 4) rotate_pos_block = 1;
+            else rotate_pos_block++;
+            
+
+            break;
+
+        case 80: // down
+            switch (copy_current_block) {
+            case 1: // cube
+                if (matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#' || matrix[block_position_y + 3][block_position_x + 1] == '1') {
+                }
+                else {
+                    block_position_y++;
+                }
+                break;
+            case 2: // T
+                switch (rotate_pos_block) {
+                case 1: // inverted T
+                    if (matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 2: // |-
+                    if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x] == '#') {
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 3: // T
+                    if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 4:
+                    if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x - 1] == '1') {
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+
+                }
+                break;
+            case 3: // I
+                switch (rotate_pos_block % 2) {
+                case 1: // I
+                    if (matrix[block_position_y + 4][block_position_x] == '1' || matrix[block_position_y + 4][block_position_x] == '#') {
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 0: // --
+                    if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 2] == '#' || matrix[block_position_y + 1][block_position_x + 2] == '1') {
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+
+                }
+                break;
+            case 4:
+                switch (rotate_pos_block % 2) {
+                case 1: // S глав. точка уже смещена на один вниз
+                    if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 0: // повернутая S 
+                    if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                }
+                break;
+            case 5:
+                switch (rotate_pos_block % 2) {
+                case 1: // Z
+                    if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 0:
+                    if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x - 1] == '1' || matrix[block_position_y + 3][block_position_x - 1] == '#') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                }
+                break;
+            }
+            case 6: // L
+                switch (rotate_pos_block) {
+                case 1: // L
+                    if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x] == '#' || matrix[block_position_y + 3][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#' || block_position_y >= 28) {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 2: // L angle 90 главная точка центральная
+                    if (matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 3: // L angle 180
+                    if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '1' || matrix[block_position_y + 3][block_position_x + 1] == '#') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+                case 4:// L angle 270 главная точка центральная
+                    if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#') {
+
+                    }
+                    else {
+                        block_position_y++;
+                    }
+                    break;
+
+                }
+                break;
+
+        }
+    }
+}
+
+
+// проверка упал ли блок
+void check_block_fallen() {
+    switch (copy_current_block) {
+    case 1: // cube
+        if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#') {
+            block_position_x = 10;
+            block_position_y = 1;
+            last_block_position_x = 10;
+            last_block_position_y = 1;
+            current_block = rand() % 5 + 1;
+            rotate_pos_block = 1;
+        }
+        break;
+
+
+    case 2: // T
+        switch (rotate_pos_block) {
+        case 1: // inverted T
+            if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#') {
+
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+
+            }
+            break;
+
+        case 2: // |-
+            if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x] == '#') {
+
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+
+            }
+            break;
+
+        case 3: // T
+            if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y][block_position_x + 1] == '1') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 4: // -|
+            if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x - 1] == '1') {
+
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+
+            }
+            break;
+        }
+        break;
+    case 3:
+        switch (rotate_pos_block % 2) {
+        case 1: // I
+            if (matrix[block_position_y + 3][block_position_x] == '1' || matrix[block_position_y + 3][block_position_x] == '#') {
+
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 0: // -
+            if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x] == '#' || matrix[block_position_y][block_position_x] == '1' || matrix[block_position_y][block_position_x + 1] == '#' || matrix[block_position_y][block_position_x + 1] == '1' || matrix[block_position_y][block_position_x + 2] == '#' || matrix[block_position_y][block_position_x + 2] == '1') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        }
+        break;
+    case 4: // S
+        switch (rotate_pos_block % 2) {
+        case 1: // S
+            if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x + 1] == '1' || matrix[block_position_y][block_position_x + 1] == '#') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 0:
+            if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+
+        }
+        break;
+    case 5:
+        switch (rotate_pos_block % 2) {
+        case 1: // Z
+            if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x] == '#' || matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 1][block_position_x + 1] == '#' || matrix[block_position_y + 1][block_position_x + 1] == '1') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 0:
+            if (matrix[block_position_y + 1][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '1' || matrix[block_position_y + 2][block_position_x - 1] == '#') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        }
+        break;
+
+    case 6: // L
+        switch (rotate_pos_block) {
+        case 1: // L
+            if (matrix[block_position_y + 2][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x] == '#' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 2: // L angle 90 главная точка центральная
+            if (matrix[block_position_y + 1][block_position_x - 1] == '1' || matrix[block_position_y + 1][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x] == '1' || matrix[block_position_y][block_position_x + 1] == '1') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 3: // L angle 180
+            if (matrix[block_position_y][block_position_x] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '1' || matrix[block_position_y + 2][block_position_x + 1] == '#') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+        case 4:// L angle 270 главная точка центральная
+            if (matrix[block_position_y][block_position_x - 1] == '1' || matrix[block_position_y][block_position_x - 1] == '#' || matrix[block_position_y][block_position_x] == '1' || matrix[block_position_y][block_position_x] == '#' || matrix[block_position_y][block_position_x + 1] == '1' || matrix[block_position_y][block_position_x + 1] == '#') {
+                block_position_x = 10;
+                block_position_y = 1;
+                last_block_position_x = 10;
+                last_block_position_y = 1;
+                current_block = rand() % 5 + 1;
+                rotate_pos_block = 1;
+            }
+            break;
+
+        }
+        break;
 
     }
 }
@@ -446,6 +534,35 @@ void cleaning_field_figure(char(&ptr_matrix)[32][32], int last_pos_x, int last_p
             ptr_matrix[last_pos_y + 1][last_pos_x] = ' ';
             ptr_matrix[last_pos_y + 1][last_pos_x - 1] = ' ';
             ptr_matrix[last_pos_y + 2][last_pos_x - 1] = ' ';
+            break;
+        }
+        break;
+
+    case 6:
+        switch (rotate) {
+        case 1: // L главная точка верхняя
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 2][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y + 2][last_pos_x + 1] = ' ';
+            break;
+        case 2: // L angle 90 главная позиция центральная верхняя
+            ptr_matrix[last_pos_y + 1][last_pos_x - 1] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x - 1] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x + 1] = ' ';
+            break;
+        case 3: // L angle 180
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x + 1] = ' ';
+            ptr_matrix[last_pos_y + 1][last_pos_x + 1] = ' ';
+            ptr_matrix[last_pos_y + 2][last_pos_x + 1] = ' ';
+            break;
+        case 4: // главная точка левая нижняя
+            ptr_matrix[last_pos_y][last_pos_x - 1] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x] = ' ';
+            ptr_matrix[last_pos_y][last_pos_x + 1] = ' ';
+            ptr_matrix[last_pos_y - 1][last_pos_x + 1] = ' ';
             break;
         }
         break;
@@ -539,6 +656,34 @@ void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotat
             ptr_matrix[block_position_y + 1][block_position_x] = '1';
             ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
             ptr_matrix[block_position_y + 2][block_position_x - 1] = '1';
+            break;
+        }
+        break;
+    case 6: // L
+        switch (rotate) {
+        case 1: // L главная точка верхняя
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x] = '1';
+            ptr_matrix[block_position_y + 2][block_position_x] = '1';
+            ptr_matrix[block_position_y + 2][block_position_x + 1] = '1';
+            break;
+        case 2: // L angle 90 главная позиция центральная верхняя
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            break;
+        case 3: // L angle 180
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y + 2][block_position_x + 1] = '1';
+            break;
+        case 4: // главная точка центральная
+            ptr_matrix[block_position_y][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y - 1][block_position_x + 1] = '1';
             break;
         }
         break;
