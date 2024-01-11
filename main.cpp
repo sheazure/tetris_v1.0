@@ -40,7 +40,7 @@ int last_block_position_y = 1;
 int current_block = rand() % 5 + 1; // менять по мере добавления блоков
 int rotate_pos_block = 1;
 
-int copy_current_block = 2;
+int copy_current_block = 1;
 
 int counter_1 = 158;
 
@@ -100,36 +100,29 @@ int main() {
        
 
         // считывание нажатий клавиш для движения/поворота фигуры
-
-        
         check_click();
-
-
         
-       
+        // отрисовка блока на матрице
         
         cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
         writing_field_figure(matrix, copy_current_block, rotate_pos_block);
-        // отрисовка блока на матрице
-
-        // проверка не застрял ли блокк в текстуре
-
-
-
+        
+        // проверка упал ли блок
         check_block_fallen();
-        
-         // проверка упал ли блок
-        
+
 
         
-
+        
         // вывод матрицы
+
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
                 std::cout << matrix[i][j];
             }
             std::cout << '\n';
         }
+
+        
 
 
         last_block_position_x = block_position_x;
@@ -142,10 +135,6 @@ int main() {
 
     }
 }
-
-
-
-
 
 
 void check_click() {
@@ -194,6 +183,7 @@ void check_block_fallen() {
         }
     }
 
+    bool event = false;
     if (counter1 < counter_1) {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
@@ -207,6 +197,25 @@ void check_block_fallen() {
         last_block_position_y = 1;
         current_block = rand() % 7 + 1;
         rotate_pos_block = 1;
+        event = true;
+    }
+
+    if (event) {
+        int counter = 0;
+        for (int i = 1; i < 31; i++) { // игровое поле
+            counter = 0;
+            for (int j = 1; j < 21; j++) { // игровое поле
+                if (matrix[i][j] == '1') counter++;
+            }
+            if (counter == 20) {
+                for (int h = 1; h < 21; h++) {
+                    matrix[i][h] = ' ';
+                }
+                counter_1 -= 20;
+
+            }
+        }
+        
     }
 
     
