@@ -37,7 +37,7 @@ int block_position_y = 1;
 int block_position_x = 10;
 int last_block_position_x = 10;
 int last_block_position_y = 1;
-int current_block = rand() % 5 + 1; // менять по мере добавления блоков
+int current_block = rand() % 7 + 1; // менять по мере добавления блоков
 int rotate_pos_block = 1;
 
 int copy_current_block = 1;
