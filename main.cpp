@@ -43,6 +43,7 @@ int rotate_pos_block = 1;
 int copy_current_block = 1;
 
 int counter_1 = 158;
+string last_move = "Null";
 
 
 
@@ -150,15 +151,15 @@ void check_click() {
         case 80: // down           
             
             block_position_y++;   
-            
+            last_move = "down";
             break;
         case 75: // left
             block_position_x--;
-            
+            last_move = "left";
             break;
         case 77: // right
             block_position_x++;
-            
+            last_move = "right";
             
             break;
 
@@ -184,6 +185,19 @@ void check_block_fallen() {
     }
 
     bool event = false;
+
+    if (counter1 < counter_1 && last_move != "Null") {
+        switch (last_move)  {
+        case "left":
+            block_position_x++;
+            break;
+        case "right":
+            block_position_x--;
+            break;
+        case "Null":
+            break;
+        }
+    }
     if (counter1 < counter_1) {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
