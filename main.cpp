@@ -27,6 +27,7 @@ line 278
 #include <stdio.h>
 #include <random>
 #include <algorithm>
+#include <string>
 
 const int WIDTH = 32;
 const int HEIGHT = 32;
@@ -39,11 +40,15 @@ int last_block_position_x = 10;
 int last_block_position_y = 1;
 int current_block = rand() % 7 + 1; // менять по мере добавления блоков
 int rotate_pos_block = 1;
+int future_block = rand() % 7 + 1;
 
-int copy_current_block = 1;
 
-int counter_1 = 158;
-string last_move = "Null";
+
+int counter_1 = 98;
+int counter_2 = 60;
+
+char last_move = 'N';
+
 
 
 
@@ -54,6 +59,7 @@ void cleaning_field_figure(char(&ptr_matrix)[32][32], int last_pos_x, int last_p
 void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotate);
 void check_block_fallen();
 void check_click();
+void check_stena_blyat();
 
 
 
@@ -62,6 +68,7 @@ void check_click();
 
 int main() {
 
+    
     // первое заполнение матрицы(границы)
     for (int i = 0; i < HEIGHT; ++i) {
         if (i == 0 || i == 31) {
@@ -73,20 +80,20 @@ int main() {
 
         for (int j = 0; j < WIDTH; ++j) {
             if (j == 21) {
-                matrix[i][j] = '1';
+                matrix[i][j] = '2';
                 continue;
             }
             matrix[i][j] = ' ';
         }
 
-        matrix[i][0] = '1';
+        matrix[i][0] = '2';
         matrix[i][31] = '1';
     }
 
- 
+
 
     while (1) {
-        
+        last_move = 'N';
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
                 copy_matrix[i][j] = matrix[i][j];
@@ -95,25 +102,27 @@ int main() {
 
 
 
-       
+
         system("cls");
         // сделать выход из прогрммы
-       
+
 
         // считывание нажатий клавиш для движения/поворота фигуры
         check_click();
-        
+
         // отрисовка блока на матрице
-        
-        cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
-        writing_field_figure(matrix, copy_current_block, rotate_pos_block);
-        
+
+        cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
+        writing_field_figure(matrix, current_block, rotate_pos_block);
+
+        check_stena_blyat();
+
         // проверка упал ли блок
         check_block_fallen();
 
 
-        
-        
+
+
         // вывод матрицы
 
         for (int i = 0; i < HEIGHT; i++) {
@@ -123,51 +132,98 @@ int main() {
             std::cout << '\n';
         }
 
-        
+
 
 
         last_block_position_x = block_position_x;
         last_block_position_y = block_position_y;
         // спуск вниз на 1, блок падает вниз
         block_position_y += 1;
-        
+
 
 
 
     }
 }
 
+void check_stena_blyat() {
+    int counter2 = 0;
+
+    for (int i = 1; i < 31; i++) {
+        for (int j = 0; j < 22; j++) {
+            if (matrix[i][j] == '2') counter2++;
+        }
+    }
+
+    if (counter2 < counter_2 && last_move != 'N') {
+        switch (last_move) {
+        case 'R':
+            block_position_x--;
+            break;
+        case 'L':
+            block_position_x++;
+            break;
+        case 'U':
+            if (rotate_pos_block == 1) rotate_pos_block = 4;
+            else rotate_pos_block--;
+        case 'D':
+            block_position_y--;
+            break;
+        
+
+        }
+        cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
+        writing_field_figure(matrix, current_block, rotate_pos_block);
+
+
+        for (int i = 1; i < 31; i++) {
+            matrix[i][0] = '2';
+            matrix[i][21] = '2';
+        }
+    }
+
+}
+
+
 
 void check_click() {
     if (_kbhit()) {
         switch (_getch()) {
         case 72: // up (поворот блока)
-            cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, copy_current_block, rotate_pos_block);
+            cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
             if (rotate_pos_block == 4) rotate_pos_block = 1;
             else rotate_pos_block++;
-            
+            last_move = 'U';
+
             break;
 
         case 80: // down           
+
+            last_move = 'D';
+            block_position_y++;
             
-            block_position_y++;   
-            last_move = "down";
             break;
         case 75: // left
+            last_move = 'L';
             block_position_x--;
-            last_move = "left";
+            
             break;
         case 77: // right
+            last_move = 'R';
             block_position_x++;
-            last_move = "right";
             
+
+            break;
+
+        default:
+            last_move = 'N';
             break;
 
         }
 
-        
+
     }
-    
+
 }
 
 
@@ -186,18 +242,7 @@ void check_block_fallen() {
 
     bool event = false;
 
-    if (counter1 < counter_1 && last_move != "Null") {
-        switch (last_move)  {
-        case "left":
-            block_position_x++;
-            break;
-        case "right":
-            block_position_x--;
-            break;
-        case "Null":
-            break;
-        }
-    }
+
     if (counter1 < counter_1) {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
@@ -209,7 +254,8 @@ void check_block_fallen() {
         block_position_y = 1;
         last_block_position_x = 10;
         last_block_position_y = 1;
-        current_block = rand() % 7 + 1;
+        current_block = future_block;
+        future_block = rand() % 7 + 1;
         rotate_pos_block = 1;
         event = true;
     }
@@ -229,10 +275,10 @@ void check_block_fallen() {
 
             }
         }
-        
+
     }
 
-    
+
 }
 
 // функции очистки и отрисовки поля после блоков
@@ -434,7 +480,7 @@ void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotat
             ptr_matrix[block_position_y][block_position_x + 1] = '1';
             ptr_matrix[block_position_y][block_position_x + 2] = '1';
             break;
-            
+
 
         }
         break;
@@ -525,7 +571,7 @@ void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotat
             ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
             break;
 
-        
+
         }
     }
 
