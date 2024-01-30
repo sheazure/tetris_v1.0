@@ -1,13 +1,6 @@
 /*
-Notes: координатой блока является левый верхний его угол
-
-чтобы перевести координаты x и y в порядковый номер светодиода нужно  --->>>> 32 * y + x
-
-
-х = 25, 26, 27, 28
-
-цифры - ширина=3, длина=5
-
+Notes:
+1.чтобы перевести координаты x и y в порядковый номер светодиода нужно  --->>>> 32 * y + x
 
 */
 
@@ -31,9 +24,11 @@ int block_position_y = 1;
 int block_position_x = 10;
 int last_block_position_x = 10;
 int last_block_position_y = 1;
-int current_block = rand() % 7 + 1; // менять по мере добавления блоков
+
+int current_block = 99; // менять по мере добавления блоков
 int rotate_pos_block = 1;
-int future_block = rand() % 7 + 1;
+
+int future_block = 99;
 int score = 0;
 
 
@@ -53,8 +48,10 @@ void cleaning_field_figure(char(&ptr_matrix)[32][32], int last_pos_x, int last_p
 void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotate);
 void check_block_fallen();
 void check_click();
-void check_stena_blyat();
-
+void check_wall();
+void print_next_block();
+void clean_next_block();
+void print_score();
 
 
 
@@ -62,7 +59,10 @@ void check_stena_blyat();
 
 int main() {
 
+    srand(time(NULL));
+    current_block = rand() % 7 + 1;
     
+    future_block = rand() % 7 + 1;
     // первое заполнение матрицы(границы)
     for (int i = 0; i < HEIGHT; ++i) {
         if (i == 0 || i == 31) {
@@ -82,6 +82,9 @@ int main() {
 
         matrix[i][0] = '2';
         matrix[i][31] = '1';
+        
+        print_next_block();
+        print_score();
     }
 
 
@@ -109,7 +112,7 @@ int main() {
         cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
         writing_field_figure(matrix, current_block, rotate_pos_block);
 
-        check_stena_blyat();
+        check_wall();
 
         // проверка упал ли блок
         check_block_fallen();
@@ -129,6 +132,7 @@ int main() {
 
 
 
+
         last_block_position_x = block_position_x;
         last_block_position_y = block_position_y;
         // спуск вниз на 1, блок падает вниз
@@ -138,9 +142,194 @@ int main() {
 
 
     }
+
+    return 0;
 }
 
-void check_stena_blyat() {
+void clear_score() {
+    matrix[2][23] = ' '; matrix[2][24] = ' '; matrix[2][25] = ' '; matrix[3][23] = ' ';  matrix[3][25] = ' '; matrix[4][23] = ' '; matrix[4][24] = ' '; matrix[4][25] = ' '; matrix[5][23] = ' '; matrix[5][25] = ' '; matrix[6][23] = ' '; matrix[6][24] = ' '; matrix[6][25] = ' ';
+    matrix[2][27] = ' '; matrix[2][28] = ' '; matrix[2][29] = ' '; matrix[3][27] = ' ';  matrix[3][29] = ' '; matrix[4][27] = ' '; matrix[4][28] = ' '; matrix[4][29] = ' '; matrix[5][27] = ' '; matrix[5][29] = ' '; matrix[6][27] = ' '; matrix[6][28] = ' '; matrix[6][29] = ' ';
+}
+
+void print_score() {
+    if (score < 10) {
+        matrix[2][23] = '3';
+        matrix[2][24] = '3';
+        matrix[2][25] = '3';
+        matrix[3][23] = '3';
+        matrix[3][25] = '3';
+        matrix[4][23] = '3';
+        matrix[4][25] = '3';
+        matrix[5][23] = '3';
+        matrix[5][25] = '3';
+        matrix[6][23] = '3';
+        matrix[6][24] = '3';
+        matrix[6][25] = '3';
+    }
+    else { // вторая цифра всегда одинаковая
+        switch (score / 10) {
+
+        case 1:
+            matrix[2][25] = '3'; matrix[3][25] = '3'; matrix[4][25] = '3'; matrix[5][25] = '3'; matrix[6][25] = '3';
+            break;
+        case 2:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][25] = '3'; matrix[4][25] = '3'; matrix[4][24] = '3'; matrix[4][23] = '3'; matrix[5][23] = '3'; matrix[6][23] = '3'; matrix[6][24] = '3'; matrix[6][25] = '3';
+            break;
+        case 3:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][25] = '3'; matrix[4][25] = '3'; matrix[4][24] = '3'; matrix[4][23] = '3'; matrix[5][25] = '3'; matrix[6][25] = '3'; matrix[6][24] = '3'; matrix[6][23] = '3';
+            break;
+        case 4:
+            matrix[2][23] = '3'; matrix[3][23] = '3'; matrix[4][23] = '3'; matrix[4][24] = '3'; matrix[4][25] = '3'; matrix[2][25] = '3'; matrix[3][25] = '3'; matrix[5][25] = '3'; matrix[6][25] = '3';
+            break;
+        case 5:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][23] = '3'; matrix[4][23] = '3'; matrix[4][24] = '3'; matrix[4][25] = '3'; matrix[5][25] = '3'; matrix[6][25] = '3'; matrix[6][24] = '3'; matrix[6][23] = '3';
+            break;
+        case 6:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][23] = '3'; matrix[4][23] = '3'; matrix[4][24] = '3'; matrix[4][25] = '3'; matrix[5][23] = '3'; matrix[5][25] = '3'; matrix[6][23] = '3'; matrix[6][24] = '3'; matrix[6][25] = '3';
+            break;
+        case 7:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][25] = '3'; matrix[4][25] = '3'; matrix[5][25] = '3'; matrix[6][25] = '3';
+            break;
+        case 8:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][23] = '3';  matrix[3][25] = '3'; matrix[4][23] = '3'; matrix[4][24] = '3'; matrix[4][25] = '3'; matrix[5][23] = '3'; matrix[5][25] = '3'; matrix[6][23] = '3'; matrix[6][24] = '3'; matrix[6][25] = '3';
+            break;
+        case 9:
+            matrix[2][23] = '3'; matrix[2][24] = '3'; matrix[2][25] = '3'; matrix[3][23] = '3';  matrix[3][25] = '3'; matrix[4][23] = '3'; matrix[4][24] = '3'; matrix[4][25] = '3'; matrix[5][25] = '3'; matrix[6][23] = '3'; matrix[6][24] = '3'; matrix[6][25] = '3';
+            break;
+        }
+
+    }
+    switch (score % 10) {
+    case 0:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][27] = '3'; matrix[3][29] = '3'; matrix[4][27] = '3'; matrix[4][29] = '3'; matrix[5][27] = '3'; matrix[5][29] = '3';  matrix[6][27] = '3'; matrix[6][28] = '3'; matrix[6][29] = '3';
+        break;
+    case 1:
+        matrix[2][29] = '3'; matrix[3][29] = '3'; matrix[4][29] = '3'; matrix[5][29] = '3'; matrix[6][29] = '3';
+        break;
+    case 2:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][29] = '3'; matrix[4][29] = '3'; matrix[4][28] = '3'; matrix[4][27] = '3'; matrix[5][27] = '3'; matrix[6][27] = '3'; matrix[6][28] = '3'; matrix[6][29] = '3';
+        break;
+    case 3:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][29] = '3'; matrix[4][29] = '3'; matrix[4][28] = '3'; matrix[4][27] = '3'; matrix[5][29] = '3'; matrix[6][29] = '3'; matrix[6][28] = '3'; matrix[6][27] = '3';
+        break;
+    case 4:
+        matrix[2][27] = '3'; matrix[3][27] = '3'; matrix[4][27] = '3'; matrix[4][28] = '3'; matrix[4][29] = '3'; matrix[2][29] = '3'; matrix[3][29] = '3'; matrix[5][29] = '3'; matrix[6][29] = '3';
+        break;
+    case 5:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][27] = '3'; matrix[4][27] = '3'; matrix[4][28] = '3'; matrix[4][29] = '3'; matrix[5][29] = '3'; matrix[6][29] = '3'; matrix[6][28] = '3'; matrix[6][27] = '3';
+        break;
+    case 6:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][27] = '3'; matrix[4][27] = '3'; matrix[4][28] = '3'; matrix[4][29] = '3'; matrix[5][27] = '3'; matrix[5][29] = '3'; matrix[6][27] = '3'; matrix[6][28] = '3'; matrix[6][29] = '3';
+        break;
+    case 7:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][29] = '3'; matrix[4][29] = '3'; matrix[5][29] = '3'; matrix[6][29] = '3';
+        break;
+    case 8:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][27] = '3';  matrix[3][29] = '3'; matrix[4][27] = '3'; matrix[4][28] = '3'; matrix[4][29] = '3'; matrix[5][27] = '3'; matrix[5][29] = '3'; matrix[6][27] = '3'; matrix[6][28] = '3'; matrix[6][29] = '3';
+        break;
+    case 9:
+        matrix[2][27] = '3'; matrix[2][28] = '3'; matrix[2][29] = '3'; matrix[3][27] = '3';  matrix[3][29] = '3'; matrix[4][27] = '3'; matrix[4][28] = '3'; matrix[4][29] = '3'; matrix[5][29] = '3'; matrix[6][27] = '3'; matrix[6][28] = '3'; matrix[6][29] = '3';
+        break;
+    }
+
+}
+
+
+void clean_next_block() {
+    switch (future_block) { // 26
+    case 1: // cube
+        matrix[15][26] = ' ';
+        matrix[15][27] = ' ';
+        matrix[16][26] = ' ';
+        matrix[16][27] = ' ';
+        break;
+    case 2: // T
+        matrix[15][26] = ' ';
+        matrix[16][25] = ' ';
+        matrix[16][26] = ' ';
+        matrix[16][27] = ' ';
+        break;
+    case 3: // I
+        matrix[15][26] = ' ';
+        matrix[16][26] = ' ';
+        matrix[17][26] = ' ';
+        matrix[18][26] = ' ';
+        break;
+    case 4: // S
+        matrix[15][26] = ' ';
+        matrix[15][27] = ' ';
+        matrix[16][25] = ' ';
+        matrix[16][26] = ' ';
+        break;
+    case 5: // Z
+        matrix[15][26] = ' ';
+        matrix[15][25] = ' ';
+        matrix[16][26] = ' ';
+        matrix[16][27] = ' ';
+        break;
+    case 6: // L
+        matrix[15][26] = ' ';
+        matrix[16][26] = ' ';
+        matrix[17][26] = ' ';
+        matrix[17][27] = ' ';
+        break;
+    case 7: // J
+        matrix[15][26] = ' ';
+        matrix[16][26] = ' ';
+        matrix[17][26] = ' ';
+        matrix[17][25] = ' ';
+        break;
+    }
+}
+
+void print_next_block() { // L J
+    switch (future_block) { // 26
+    case 1: // cube
+        matrix[15][26] = '3';
+        matrix[15][27] = '3';
+        matrix[16][26] = '3';
+        matrix[16][27] = '3';
+        break;
+    case 2: // T
+        matrix[15][26] = '3';
+        matrix[16][25] = '3';
+        matrix[16][26] = '3';
+        matrix[16][27] = '3';
+        break;
+    case 3: // I
+        matrix[15][26] = '3';
+        matrix[16][26] = '3';
+        matrix[17][26] = '3';
+        matrix[18][26] = '3';
+        break;
+    case 4: // S
+        matrix[15][26] = '3';
+        matrix[15][27] = '3';
+        matrix[16][25] = '3';
+        matrix[16][26] = '3';
+        break;
+    case 5: // Z
+        matrix[15][26] = '3';
+        matrix[15][25] = '3';
+        matrix[16][26] = '3';
+        matrix[16][27] = '3';
+        break;
+    case 6: // L
+        matrix[15][26] = '3';
+        matrix[16][26] = '3';
+        matrix[17][26] = '3';
+        matrix[17][27] = '3';
+        break;
+    case 7: // J
+        matrix[15][26] = '3';
+        matrix[16][26] = '3';
+        matrix[17][26] = '3';
+        matrix[17][25] = '3';
+        break;
+    }
+}
+
+void check_wall() {
     int counter2 = 0;
 
     for (int i = 1; i < 31; i++) {
@@ -248,10 +437,13 @@ void check_block_fallen() {
         block_position_y = 1;
         last_block_position_x = 10;
         last_block_position_y = 1;
-        current_block = future_block;
-        future_block = rand() % 7 + 1;
         rotate_pos_block = 1;
         event = true;
+        clean_next_block();
+        
+        current_block = future_block;
+        future_block = rand() % 7 + 1;
+        print_next_block();
     }
 
     if (event) {
@@ -267,7 +459,11 @@ void check_block_fallen() {
                 }
                 counter_1 -= 20;
                 score++;
-
+                for (int r = i - 1; r > 0; r--) {
+                    for (int j = 1; j < 21; j++) {
+                        matrix[r + 1][j] = matrix[r][j];
+                    }
+                }
             }
         }
 
