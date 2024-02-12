@@ -33,8 +33,9 @@ int score = 0;
 
 
 
-int counter_1 = 98;
+int counter_1 = 94;
 int counter_2 = 60;
+int counter_b = 4;
 
 char last_move = 'N';
 
@@ -61,7 +62,7 @@ int main() {
 
     srand(time(NULL));
     current_block = rand() % 7 + 1;
-    
+
     future_block = rand() % 7 + 1;
     // первое заполнение матрицы(границы)
     for (int i = 0; i < HEIGHT; ++i) {
@@ -82,7 +83,7 @@ int main() {
 
         matrix[i][0] = '2';
         matrix[i][31] = '1';
-        
+
         print_next_block();
         print_score();
     }
@@ -352,7 +353,7 @@ void check_wall() {
         case 'D':
             block_position_y--;
             break;
-        
+
 
         }
         cleaning_field_figure(matrix, last_block_position_x, last_block_position_y, current_block, rotate_pos_block);
@@ -384,17 +385,17 @@ void check_click() {
 
             last_move = 'D';
             block_position_y++;
-            
+
             break;
         case 75: // left
             last_move = 'L';
             block_position_x--;
-            
+
             break;
         case 77: // right
             last_move = 'R';
             block_position_x++;
-            
+
 
             break;
 
@@ -414,25 +415,27 @@ void check_click() {
 // проверка упал ли блок
 void check_block_fallen() {
     int counter1 = 0;
+    int counterb = 0;
 
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
             if (matrix[i][j] == '1') {
                 counter1++;
             }
+            if (matrix[i][j] == 'b') counterb++;
         }
     }
 
     bool event = false;
 
 
-    if (counter1 < counter_1) {
+    if (counter1 < counter_1 || counterb < counter_b) {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
                 matrix[i][j] = copy_matrix[i][j];
             }
         }
-        counter_1 += 4;
+        counter_b += 4;
         block_position_x = 10;
         block_position_y = 1;
         last_block_position_x = 10;
@@ -440,7 +443,7 @@ void check_block_fallen() {
         rotate_pos_block = 1;
         event = true;
         clean_next_block();
-        
+
         current_block = future_block;
         future_block = rand() % 7 + 1;
         print_next_block();
@@ -451,13 +454,13 @@ void check_block_fallen() {
         for (int i = 1; i < 31; i++) { // игровое поле
             counter = 0;
             for (int j = 1; j < 21; j++) { // игровое поле
-                if (matrix[i][j] == '1') counter++;
+                if (matrix[i][j] == 'b') counter++;
             }
             if (counter == 20) {
                 for (int h = 1; h < 21; h++) {
                     matrix[i][h] = ' ';
                 }
-                counter_1 -= 20;
+                counter_b -= 20;
                 score++;
                 for (int r = i - 1; r > 0; r--) {
                     for (int j = 1; j < 21; j++) {
@@ -624,52 +627,52 @@ void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotat
     // writing figure
     switch (currentBlock) {
     case 1:
-        ptr_matrix[block_position_y][block_position_x] = '1';
-        ptr_matrix[block_position_y][block_position_x + 1] = '1';
-        ptr_matrix[block_position_y + 1][block_position_x] = '1';
-        ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+        ptr_matrix[block_position_y][block_position_x] = 'b';
+        ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+        ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+        ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
         break;
     case 2:
         switch (rotate) {
         case 1: // T inverted
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
             break;
         case 2: // |-    <- figure
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x] = 'b';
             break;
         case 3: // T исключение главная точка верхняя центраальная
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
             break;
         case 4: // -|
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x] = 'b';
             break;
         }
         break;
     case 3: // I
         switch (rotate % 2) { // потому что поворотов фигуры всего 2
         case 1: // I
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x] = '1';
-            ptr_matrix[block_position_y + 3][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 3][block_position_x] = 'b';
             break;
         case 0: // -
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y][block_position_x + 2] = '1';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 2] = 'b';
             break;
 
 
@@ -678,88 +681,88 @@ void writing_field_figure(char(&ptr_matrix)[32][32], int currentBlock, int rotat
     case 4: // S
         switch (rotate % 2) { // потому что поворотов фигуры всего 2
         case 1: // S главная точка центр верх
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
             break;
         case 0: // главная точка верхняя
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x + 1] = 'b';
             break;
         }
         break;
     case 5: // Z
         switch (rotate % 2) {
         case 1: // Z главная точка центр верх
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
             break;
         case 0: // главная точка верх
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x - 1] = 'b';
             break;
         }
         break;
     case 6: // L
         switch (rotate) {
         case 1: // L главная точка верхняя
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x + 1] = 'b';
             break;
         case 2: // L angle 90 главная позиция центральная верхняя
-            ptr_matrix[block_position_y + 1][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y + 1][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
             break;
         case 3: // L angle 180
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x + 1] = 'b';
             break;
         case 4: // главная точка центральная
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y - 1][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y - 1][block_position_x + 1] = 'b';
             break;
         }
         break;
     case 7: // J
         switch (rotate) {
         case 1:
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x - 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x - 1] = 'b';
             break;
         case 2:
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y - 1][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y - 1][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
             break;
         case 3:
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x] = '1';
-            ptr_matrix[block_position_y + 2][block_position_x] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x] = 'b';
+            ptr_matrix[block_position_y + 2][block_position_x] = 'b';
             break;
         case 4:
-            ptr_matrix[block_position_y][block_position_x] = '1';
-            ptr_matrix[block_position_y][block_position_x - 1] = '1';
-            ptr_matrix[block_position_y][block_position_x + 1] = '1';
-            ptr_matrix[block_position_y + 1][block_position_x + 1] = '1';
+            ptr_matrix[block_position_y][block_position_x] = 'b';
+            ptr_matrix[block_position_y][block_position_x - 1] = 'b';
+            ptr_matrix[block_position_y][block_position_x + 1] = 'b';
+            ptr_matrix[block_position_y + 1][block_position_x + 1] = 'b';
             break;
 
 
