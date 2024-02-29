@@ -392,7 +392,7 @@ void check_click() {
 
             break;
 
-        case 80: // down           
+        case 80: // down        
             
             last_move = 'D';
             block_position_y++;
