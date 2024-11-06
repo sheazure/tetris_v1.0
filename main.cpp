@@ -367,7 +367,7 @@ void check_wall() {
 
 
         }
-       
+
         writing_field_figure(matrix, current_block, rotate_pos_block);
 
 
@@ -393,7 +393,7 @@ void check_click() {
             break;
 
         case 80: // down        
-            
+
             last_move = 'D';
             block_position_y++;
 
@@ -498,7 +498,7 @@ void check_block_fallen() {
                         matrix[r + 1][j] = matrix[r][j];
                     }
                 }
-                
+
             }
         }
 
